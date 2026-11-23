@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact · Seahorse Natural Oils</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/img/logo-crop.png">
+</head>
+<body data-page="contact">
+<div id="site-header"></div>
+<main id="main">
+  <div class="page-hero"><div class="wrap">
+    <div class="crumbs"><a href="index.html">Home</a> / Contact</div>
+    <h1>Let's talk about your requirement</h1>
+    <p style="max-width:620px;margin:0">Call, WhatsApp or write to us. For prices on several products, the <a href="rfq.html" style="color:#F2C766">quote basket</a> is fastest.</p>
+  </div></div>
+
+  <div class="wrap contact-grid">
+    <div class="grid" style="align-content:start">
+      <div class="card office"><div class="ic" data-i="pin"></div><div><b>Registered office: Vadodara</b><p class="muted" style="margin:4px 0 0">22, First Floor, B.H. Complex, Near Utkarsh Petrol Pump, Karelibaugh, Vadodara 390018, Gujarat, India</p></div></div>
+      <div class="card office"><div class="ic" data-i="factory"></div><div><b>Plant: Vadodara</b><p class="muted" style="margin:4px 0 0">Waghodia Road, Bapod, Vadodara, Gujarat</p></div></div>
+      <div class="card office"><div class="ic" data-i="pin"></div><div><b>Branch: Jaipur</b><p class="muted" style="margin:4px 0 0">B-48, Govindpuri B, Ramnagar Extension, Sodala, Jaipur 302019, Rajasthan</p></div></div>
+      <div class="grid g-2">
+        <a class="card office" href="tel:+919426210669" style="color:var(--text)"><div class="ic" data-i="phone"></div><div><b>Call</b><p class="muted" style="margin:4px 0 0">+91 94262 10669</p></div></a>
+        <a class="card office" href="https://wa.me/919426210669" target="_blank" rel="noopener" style="color:var(--text)"><div class="ic" data-i="wa"></div><div><b>WhatsApp</b><p class="muted" style="margin:4px 0 0">Mon–Sat, 9:30–18:30 IST</p></div></a>
+      </div>
+      <a class="card office" href="mailto:dkumar@seahorsepharma.com" style="color:var(--text)"><div class="ic" data-i="mail"></div><div><b>E-mail</b><p class="muted" style="margin:4px 0 0">dkumar@seahorsepharma.com</p></div></a>
+    </div>
+
+    <div>
+      <form class="card form" id="cform" novalidate>
+        <h2 style="font-size:24px;margin:0">Send a message</h2>
+        <div class="two">
+          <div class="field"><label for="n">Name *</label><input id="n" autocomplete="name" required><div class="err">Please enter your name</div></div>
+          <div class="field"><label for="e">E-mail *</label><input id="e" type="email" autocomplete="email" required><div class="err">Please enter a valid e-mail</div></div>
+        </div>
+        <div class="field"><label for="s">Subject</label><select id="s"><option>Product enquiry</option><option>Sample request</option><option>Become a distributor</option><option>Other</option></select></div>
+        <div class="field"><label for="m">Message *</label><textarea id="m" required></textarea><div class="err">Please write a message</div></div>
+        <label class="consent"><input type="checkbox" id="c"> I agree to be contacted about this message.</label>
+        <button class="btn btn-primary" type="submit">Send message</button>
+      </form>
+      <div class="map" style="margin-top:18px"><iframe title="Google Map: Utkarsh Petrol Pump, Karelibaugh, Vadodara" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Utkarsh+Petrol+Pump,+Karelibaugh,+Vadodara,+Gujarat+390018&amp;output=embed"></iframe></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px"><a class="btn btn-primary btn-sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&amp;destination=Utkarsh+Petrol+Pump,+Karelibaugh,+Vadodara">Get directions</a><a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Seahorse+Pharma+Vadodara">Rate us on Google</a></div>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  document.getElementById('cform').addEventListener('submit', e => {
+    e.preventDefault(); let ok = true;
+    [['n', v => v.length > 1], ['e', v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)], ['m', v => v.length > 5]].forEach(([id, t]) => { const el = document.getElementById(id); const g = t(el.value.trim()); el.closest('.field').classList.toggle('invalid', !g); ok = ok && g; });
+    if (!document.getElementById('c').checked) { ok = false; SH.toast('Please accept the consent'); }
+    if (ok) { e.target.innerHTML = `<div class="success"><div class="tick">${SH.icon('tick')}</div><h2>Message sent</h2><p class="muted">We'll reply within one working day. (Demo: nothing was sent.)</p></div>`; }
+  });
+</script>
+</body>
+</html>

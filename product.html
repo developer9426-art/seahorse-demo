@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Product · Seahorse Natural Oils</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/img/logo-crop.png">
+</head>
+<body data-page="products">
+<div id="site-header"></div>
+<main id="main">
+  <div class="wrap" style="padding-top:20px"><div class="crumbs" style="color:var(--muted)" id="crumbs"></div></div>
+  <div class="wrap pd" id="pd"></div>
+
+  <div class="wrap">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="spec">Specifications</button>
+      <button role="tab" aria-selected="false" data-tab="pack">Packaging &amp; shipping</button>
+      <button role="tab" aria-selected="false" data-tab="app">Applications</button>
+      <button role="tab" aria-selected="false" data-tab="rev">Reviews</button>
+      <button role="tab" aria-selected="false" data-tab="faq">FAQ</button>
+    </div>
+    <div id="tabbody" style="padding:24px 0"></div>
+  </div>
+
+  <section style="padding-top:20px">
+    <div class="wrap"><h2>Related products</h2><div class="grid g-4" id="related" style="margin-top:18px"></div></div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/bottle3d.js"></script>
+<script>
+  const slug = new URLSearchParams(location.search).get('p') || 'evening-primrose-oil';
+  const p = SH_PRODUCTS.find(x => x.slug === slug) || SH_PRODUCTS[0];
+  const cat = SH_CATEGORIES.find(c => c.slug === p.cat);
+  document.title = `${p.name} (${p.botanical}) · Seahorse Natural Oils`;
+  document.getElementById('crumbs').innerHTML = `<a href="index.html">Home</a> / <a href="products.html">Products</a> / <a href="products.html?cat=${cat.slug}">${cat.name}</a> / ${p.name}`;
+  const cas = (p.specs.find(s => s[0] === 'CAS No.') || [])[1];
+  let pack = SH.cheapest(p) || p.packs[0], qty = 1;
+  const views = [{ k: 'img', html: `<img src="${p.img}" alt="${p.name}: ${p.botanical}">` },
+    { k: '3d', html: `<div class="v3d" id="v3d"><span class="hint">Drag to rotate · 3D view</span></div>`, thumb: `<span class="t3d">3D</span>` }]
+    .concat(p.photo ? [{ k: 'client', html: `<img src="${p.photo}" alt="${p.name}">` }] : []);
+  let viewer = null;
+  async function showView(i) {
+    if (viewer) { viewer.destroy(); viewer = null; }
+    document.getElementById('gmain').innerHTML = views[i].html;
+    if (views[i].k === '3d') viewer = await SH3D.mount(document.getElementById('v3d'), { oils: [{ name: p.name.replace(' Oleoresin', ''), botanical: p.botanical, color: p.color }], drag: true, drops: 14 })
+      || (document.getElementById('gmain').innerHTML = SH.bottle(p.color), null);
+  }
+
+  const pd = document.getElementById('pd');
+  pd.style.setProperty('--c', p.color);
+  pd.innerHTML = `
+    <div class="gallery">
+      <div class="main" id="gmain">${views[0].html}</div>
+      <div class="thumbs">${views.map((v, i) => `<button class="${i ? '' : 'on'}" data-g="${i}" aria-label="${v.k === '3d' ? '3D view' : 'View ' + (i + 1)}">${v.thumb || v.html}</button>`).join('')}</div>
+    </div>
+    <div>
+      <span class="eyebrow">${cat.name} · ${p.code}</span>
+      <h1>${p.name}</h1>
+      <div class="bot">${p.botanical}</div>
+      ${SH.rating(p) ? `<a href="#reviews" class="rate-link" data-open-rev>${SH.rating(p)}</a>` : ""}
+      <div class="badges">${p.grades.map(g => `<span class="${SH.gradeCls(g)}">${g}</span>`).join('')}</div>
+      <div class="meta-row">${cas ? `<span>CAS <b>${cas}</b> <button class="copy" data-copy="${cas}">Copy</button></span>` : ''}<span>MOQ <b>${p.moq}</b></span><span>Dispatch <b>${p.lead}</b></span></div>
+      <p>${p.about}</p>
+      <div class="buy-box">
+        <div class="price-line" id="pline"></div>
+        <p class="label">Pack size</p>
+        <div class="chips" id="packs">${p.packs.map(s => { const pr = SH_PRICE(p, s); return `<button class="chip" aria-pressed="${s === pack}" data-pack="${s}">${s}<small>${pr ? '₹' + SH.fmt(pr) : 'Bulk quote'}</small></button>`; }).join('')}</div>
+        <div class="row">
+          <div class="qty"><button aria-label="Less" data-q="-1">−</button><input id="qty" value="1" inputmode="numeric" aria-label="Quantity"><button aria-label="More" data-q="1">+</button></div>
+          <button class="btn btn-accent" id="add"></button>
+          <a class="btn btn-ghost" target="_blank" rel="noopener" href="https://wa.me/919426210669?text=${encodeURIComponent('Enquiry: ' + p.name + ' (' + p.code + ')')}">${SH.icon('wa')}WhatsApp</a>
+        </div>
+        <p class="mode-note" id="mnote"></p>
+      </div>
+      <p class="label">Share</p>
+      <div class="share" id="share">
+        <a data-sh="wa" target="_blank" rel="noopener" aria-label="Share on WhatsApp">${SH.icon('wa')}</a><a data-sh="fb" target="_blank" rel="noopener" aria-label="Share on Facebook">${SH.icon('facebook')}</a>
+        <a data-sh="li" target="_blank" rel="noopener" aria-label="Share on LinkedIn">${SH.icon('linkedin')}</a><button data-sh="copy" aria-label="Copy link">${SH.icon('share')}</button></div>
+      <p class="label">Documents</p>
+      <div class="doc-row">
+        <button class="doc" data-doc="COA">${SH.icon('doc')}Request COA</button>
+        <button class="doc" data-doc="MSDS">${SH.icon('doc')}Request MSDS</button>
+        <button class="doc" data-doc="TDS">${SH.icon('doc')}Request TDS</button>
+      </div>
+    </div>`;
+
+  const tabs = {
+    spec: `<table class="spec"><tbody>${p.specs.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
+      <div class="disclaimer">Typical values. Exact specification is given on the Certificate of Analysis for each batch. This product is supplied as a raw material for further manufacturing; statements have not been evaluated by any drug authority and it is not intended to diagnose, treat or cure any disease.</div>`,
+    pack: `<table class="spec"><tbody><tr><th>Available pack sizes</th><td>${p.packs.join(' · ')}</td></tr><tr><th>Packaging type</th><td>${p.packing}</td></tr><tr><th>Minimum order</th><td>${p.moq}</td></tr><tr><th>Dispatch time</th><td>${p.lead} from order confirmation</td></tr><tr><th>Shipping</th><td>Sea, air and courier. FOB, CIF and DDP terms on request</td></tr><tr><th>Documents shipped</th><td>COA, MSDS, packing list, commercial invoice, certificate of origin</td></tr></tbody></table>`,
+    app: `<div class="grid g-3"><div class="card"><b>Pharmaceutical</b><p class="muted" style="margin:6px 0 0">Raw material for capsules, syrups and topical preparations.</p></div><div class="card"><b>Cosmetics</b><p class="muted" style="margin:6px 0 0">Skin-care oils, creams, serums and hair care.</p></div><div class="card"><b>Nutraceutical</b><p class="muted" style="margin:6px 0 0">Softgels and dietary supplement formulations.</p></div></div>`,
+    faq: `<details class="card" open><summary><b>Can I get a sample before a bulk order?</b></summary><p class="muted" style="margin:10px 0 0">Yes. Choose the 10 ml / 100 ml pack or send a sample request with your quote.</p></details>
+          <details class="card" style="margin-top:10px"><summary><b>Do you supply to custom specifications?</b></summary><p class="muted" style="margin:10px 0 0">Yes. Share your specification sheet and we confirm feasibility and COA values before dispatch.</p></details>
+          <details class="card" style="margin-top:10px"><summary><b>Do you offer private-label packing?</b></summary><p class="muted" style="margin:10px 0 0">Yes, for most pack sizes from 10 ml upward.</p></details>`
+  };
+  const R = SH_RATING[p.slug] || [0, 0];
+  const dist = [.78, .15, .04, .02, .01].map(x => Math.round(x * R[1]));
+  const sample = [['Priya S.', 'Formulation chemist, Pune', 5, 'Consistent quality across three batches. COA matched our in-house GC results.'],
+    ['M. Rahman', 'Importer, Dubai', 5, 'Fast quote, proper export documents, drums arrived well sealed.'],
+    ['Anil K.', 'Spa owner, Jaipur', 4, 'Lovely aroma in the 100 ml pack. Delivery took 3 days.']];
+  tabs.rev = `<div class="rev-grid" id="reviews">
+      <div class="card rev-sum"><b class="big">${R[0]}</b>${SH.stars(R[0], 22)}<p class="muted">${R[1]} ratings</p>
+        ${dist.map((n, i) => `<div class="rbar"><span>${5 - i}★</span><i><em style="width:${R[1] ? n / R[1] * 100 : 0}%"></em></i><span>${n}</span></div>`).join('')}
+        <p class="muted" style="font-size:12px;margin:12px 0 0">Average of approved reviews only.</p></div>
+      <div>${sample.map(([n, w, s, t]) => `<div class="card rev"><div class="rev-h"><span class="av">${n[0]}</span><span><b>${n}</b><small>${w}</small></span>${SH.stars(s)}</div><p>${t}</p><span class="vb">${SH.icon('check')}Verified buyer</span> <span class="sample">Sample review (demo)</span></div>`).join('')}
+        <form class="card rev-form" id="revform"><b>Write a review</b>
+          <div class="star-in" role="radiogroup" aria-label="Your rating">${[1, 2, 3, 4, 5].map(i => `<button type="button" role="radio" aria-checked="false" data-star="${i}" aria-label="${i} star">★</button>`).join('')}</div>
+          <div class="field"><textarea placeholder="How was the quality, aroma, packing and delivery?" aria-label="Review"></textarea></div>
+          <button class="btn btn-primary btn-sm" type="submit">Submit review</button><p class="muted" style="font-size:12.5px;margin:0">Reviews appear after a quick check by our team.</p></form>
+      </div></div>`;
+  const tb = document.getElementById('tabbody'); tb.innerHTML = tabs.spec;
+  const openTab = k => { document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', x.dataset.tab === k)); tb.innerHTML = tabs[k]; };
+  tb.addEventListener('click', e => { const s = e.target.closest('[data-star]'); if (s) { const v = +s.dataset.star; tb.querySelectorAll('[data-star]').forEach(b => { b.classList.toggle('on', +b.dataset.star <= v); b.setAttribute('aria-checked', +b.dataset.star === v); }); } });
+  tb.addEventListener('submit', e => { if (e.target.id === 'revform') { e.preventDefault(); e.target.innerHTML = '<b>Thank you!</b><p class="muted" style="margin:6px 0 0">Your review will appear after approval. (Demo)</p>'; } });
+  const url = location.href.split('#')[0], txt = encodeURIComponent(p.name + ' by Seahorse Natural Oils');
+  const shareMap = { wa: 'https://wa.me/?text=' + txt + '%20' + encodeURIComponent(url), fb: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), li: 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url) };
+  document.querySelectorAll('[data-sh]').forEach(a => { if (shareMap[a.dataset.sh]) a.href = shareMap[a.dataset.sh]; });
+  document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) openTab(b.dataset.tab); });
+
+  function sync() {
+    const pr = SH_PRICE(p, pack), q = Math.max(1, +document.getElementById('qty').value || 1);
+    document.getElementById('pline').innerHTML = pr ? `<b>₹${SH.fmt(pr * q)}</b><small>${pack} × ${q} · incl. GST · free shipping above ₹999</small>` : `<b style="font-size:22px">Bulk pack: price on quote</b><small>MOQ ${p.moq} · dispatch ${p.lead}</small>`;
+    document.getElementById('add').innerHTML = pr ? `${SH.icon('basket')}Add to cart` : `${SH.icon('doc')}Add to bulk quote`;
+    document.getElementById('add').className = pr ? 'btn btn-accent' : 'btn btn-primary';
+    document.getElementById('mnote').textContent = pr ? 'Small packs ship from Vadodara in 1–2 days. Need more? Choose a bulk pack for a custom quote.' : 'Bulk prices depend on quantity, grade and destination. Our export team replies within 24 hours.';
+  }
+  sync();
+  document.getElementById('qty').addEventListener('input', sync);
+  pd.addEventListener('click', e => {
+    const c = e.target.closest('[data-pack]'); if (c) { pack = c.dataset.pack; document.querySelectorAll('[data-pack]').forEach(x => x.setAttribute('aria-pressed', x === c)); sync(); }
+    const q = e.target.closest('[data-q]'); if (q) { const i = document.getElementById('qty'); i.value = Math.max(1, (+i.value || 1) + +q.dataset.q); sync(); }
+    if (e.target.closest('#add')) SH.rfq.add(p.slug, pack, document.getElementById('qty').value, SH_PRICE(p, pack) ? 'buy' : 'quote');
+    const g = e.target.closest('[data-g]'); if (g) { document.querySelectorAll('[data-g]').forEach(x => x.classList.toggle('on', x === g)); showView(+g.dataset.g); }
+    const d = e.target.closest('[data-doc]'); if (d) location.href = `rfq.html?doc=${d.dataset.doc}&p=${p.slug}`;
+    if (e.target.closest('[data-open-rev]')) { e.preventDefault(); openTab('rev'); document.querySelector('.tabs').scrollIntoView({ behavior: 'smooth' }); }
+    if (e.target.closest('[data-sh="copy"]')) { navigator.clipboard?.writeText(location.href).catch(() => {}); SH.toast('Product link copied'); }
+    const cp = e.target.closest('[data-copy]'); if (cp) { navigator.clipboard?.writeText(cp.dataset.copy).catch(() => {}); SH.toast('CAS number copied'); }
+  });
+  // open with the live 3D bottle; the photo stays one tap away
+  const go3d = () => { if (document.querySelector('[data-g].on')?.dataset.g !== '0') return; document.querySelectorAll('[data-g]').forEach(x => x.classList.toggle('on', x.dataset.g === '1')); showView(1); };
+  const idle = window.requestIdleCallback || (f => setTimeout(f, 200));
+  if (document.readyState === 'complete') idle(go3d); else addEventListener('load', () => idle(go3d));
+  document.getElementById('related').innerHTML = SH_PRODUCTS.filter(x => x.slug !== p.slug && x.cat === p.cat).concat(SH_PRODUCTS.filter(x => x.cat !== p.cat)).slice(0, 4).map(SH.card).join('');
+</script>
+</body>
+</html>

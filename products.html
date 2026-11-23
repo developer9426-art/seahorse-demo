@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Products · Seahorse Natural Oils</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/img/logo-crop.png">
+</head>
+<body data-page="products">
+<div id="site-header"></div>
+<main id="main">
+  <div class="page-hero"><div class="wrap">
+    <div class="crumbs"><a href="index.html">Home</a> / Products</div>
+    <h1 id="title">All products</h1>
+    <p style="max-width:620px;margin:0">Essential oils, carrier oils, oleoresins and pharmaceutical-grade oils, with specs, pack sizes and MOQ on every product.</p>
+  </div></div>
+
+  <div class="wrap listing">
+    <aside class="filters" id="filters" aria-label="Filters">
+      <h4>Category</h4><div id="f-cat"></div>
+      <h4>Grade</h4><div id="f-grade"></div>
+      <h4>Extraction</h4><div id="f-ext"></div>
+    </aside>
+    <div>
+      <div class="toolbar">
+        <div class="search" id="search"><span data-i="search"></span><input id="q" type="search" placeholder="Search name, botanical name or CAS no." aria-label="Search products" autocomplete="off"></div>
+        <button class="btn btn-ghost btn-sm filter-toggle" id="ft">Filters</button>
+        <select class="sort" id="sort" aria-label="Sort"><option value="pop">Most requested</option><option value="az">Name A–Z</option><option value="code">Product code</option></select>
+      </div>
+      <p class="muted" id="result" style="font-size:14px;margin:0 0 14px"></p>
+      <div class="grid g-3" id="list"></div>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/bottle3d.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const state = { cat: params.get('cat') ? [params.get('cat')] : [], grade: [], ext: [], q: params.get('q') || '', sort: 'pop' };
+  const extOf = p => (p.grades.find(g => /distilled|pressed|extracted/i.test(g)) || 'Other');
+  const grades = ['BP', 'IP', 'Organic', 'Natural', 'Virgin'];
+  const exts = [...new Set(SH_PRODUCTS.map(extOf))];
+  const box = (name, val, label, n, on) => `<label><input type="checkbox" name="${name}" value="${val}" ${on ? 'checked' : ''}> ${label}<span class="count">${n}</span></label>`;
+  document.getElementById('f-cat').innerHTML = SH_CATEGORIES.map(c => box('cat', c.slug, c.name, SH_PRODUCTS.filter(p => p.cat === c.slug || (c.slug === 'organic' && p.grades.includes('Organic'))).length, state.cat.includes(c.slug))).join('');
+  document.getElementById('f-grade').innerHTML = grades.map(g => box('grade', g, g, SH_PRODUCTS.filter(p => p.grades.includes(g)).length)).join('');
+  document.getElementById('f-ext').innerHTML = exts.map(x => box('ext', x, x, SH_PRODUCTS.filter(p => extOf(p) === x).length)).join('');
+  document.getElementById('q').value = state.q;
+
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  function render() {
+    const q = norm(state.q);
+    let list = SH_PRODUCTS.filter(p =>
+      (!state.cat.length || state.cat.includes(p.cat) || (state.cat.includes('organic') && p.grades.includes('Organic'))) &&
+      (!state.grade.length || state.grade.some(g => p.grades.includes(g))) &&
+      (!state.ext.length || state.ext.includes(extOf(p))) &&
+      (!q || [p.name, p.botanical, p.code, ...(p.specs.find(s => s[0] === 'CAS No.') || [])].some(v => norm(v).includes(q))));
+    if (state.sort === 'az') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+    if (state.sort === 'code') list = [...list].sort((a, b) => a.code.localeCompare(b.code));
+    if (state.sort === 'pop') list = [...list].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+    document.getElementById('list').innerHTML = list.length ? list.map(SH.card).join('') : `<div class="empty card" style="grid-column:1/-1">No products match. Try a botanical name (e.g. <i>Mentha</i>) or a CAS number, or <a href="rfq.html">ask us</a>: we source 190+ materials.</div>`;
+    document.getElementById('result').textContent = `${list.length} product${list.length === 1 ? '' : 's'}${state.q ? ` for “${state.q}”` : ''}`;
+    const c = state.cat.length === 1 ? SH_CATEGORIES.find(x => x.slug === state.cat[0]) : null;
+    document.getElementById('title').textContent = c ? c.name : 'All products';
+    const u = new URLSearchParams(); if (state.cat.length === 1) u.set('cat', state.cat[0]); if (state.q) u.set('q', state.q);
+    history.replaceState(null, '', location.pathname + (u.toString() ? '?' + u : '') + location.hash);
+    SH.reveal(document.getElementById('list'));
+  }
+  document.getElementById('filters').addEventListener('change', e => { const t = e.target; const a = state[t.name]; t.checked ? a.push(t.value) : a.splice(a.indexOf(t.value), 1); render(); });
+  let deb; document.getElementById('q').addEventListener('input', e => { clearTimeout(deb); deb = setTimeout(() => { state.q = e.target.value.trim(); render(); }, 150); });
+  document.getElementById('sort').addEventListener('change', e => { state.sort = e.target.value; render(); });
+  document.getElementById('ft').addEventListener('click', () => document.getElementById('filters').classList.toggle('open'));
+  if (location.hash === '#search') setTimeout(() => document.getElementById('q').focus(), 50);
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cart &amp; Quote · Seahorse Natural Oils</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/img/logo-crop.png">
+</head>
+<body data-page="rfq">
+<div id="site-header"></div>
+<main id="main">
+  <div class="page-hero"><div class="wrap">
+    <div class="crumbs"><a href="index.html">Home</a> / Cart &amp; quote</div>
+    <h1>Your cart &amp; quote request</h1>
+    <p style="max-width:640px;margin:0">Small packs are paid online now. Bulk packs go to our export team for a custom quote, usually answered within 24 hours.</p>
+  </div></div>
+
+  <div class="wrap rfq" id="rfq">
+    <div>
+      <div class="card" id="cart">
+        <div class="sec-title"><span class="pill buy">Buy online</span><h2 style="font-size:24px;margin:0">Cart <span class="muted" id="nb" style="font:500 16px var(--sans)"></span></h2></div>
+        <div id="buyItems"></div>
+        <div id="totals"></div>
+      </div>
+
+      <div class="card" id="quote" style="margin-top:18px">
+        <div class="sec-title"><span class="pill quote">Bulk &amp; export</span><h2 style="font-size:24px;margin:0">Quote request <span class="muted" id="nq" style="font:500 16px var(--sans)"></span></h2></div>
+        <div id="quoteItems"></div>
+        <a href="products.html" class="btn btn-ghost btn-sm" style="margin-top:16px">+ Add more products</a>
+      </div>
+      <div class="card" style="margin-top:18px;display:flex;gap:14px;align-items:flex-start">
+        <span style="color:var(--brand)" data-i="shield"></span>
+        <p class="muted" style="margin:0;font-size:14px">Payments are processed by Razorpay; card details never touch our servers. Your details are used only for this order or enquiry, as required by India's DPDP Act 2023.</p>
+      </div>
+    </div>
+
+    <form class="card form" id="form" novalidate style="align-self:start">
+      <h2 style="font-size:24px;margin:0">Send quote request</h2>
+      <div class="field"><label for="type">Request type</label><select id="type"><option>Price quotation</option><option>Sample request</option><option value="COA">COA request</option><option value="MSDS">MSDS request</option><option value="TDS">TDS request</option></select></div>
+      <div class="two">
+        <div class="field"><label for="name">Full name *</label><input id="name" autocomplete="name" required><div class="err">Please enter your name</div></div>
+        <div class="field"><label for="company">Company *</label><input id="company" autocomplete="organization" required><div class="err">Please enter your company</div></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="email">Business e-mail *</label><input id="email" type="email" autocomplete="email" required><div class="err">Please enter a valid e-mail</div></div>
+        <div class="field"><label for="phone">Phone / WhatsApp *</label><input id="phone" type="tel" autocomplete="tel" placeholder="+44 20 1234 5678" required><div class="err">Please include country code</div></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="country">Country *</label><select id="country" required><option value="">Select country</option><option>India</option><option>United States</option><option>United Kingdom</option><option>Germany</option><option>France</option><option>United Arab Emirates</option><option>Saudi Arabia</option><option>Singapore</option><option>Australia</option><option>Other</option></select><div class="err">Please choose a country</div></div>
+        <div class="field"><label for="terms">Delivery terms</label><select id="terms"><option>Not sure yet</option><option>EXW Vadodara</option><option>FOB Mundra / Nhava Sheva</option><option>CIF (destination port)</option><option>DDP (door delivery)</option></select></div>
+      </div>
+      <div class="field"><label for="msg">Message</label><textarea id="msg" placeholder="Quantity per year, specification, destination port…"></textarea></div>
+      <input class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" id="website">
+      <label class="consent"><input type="checkbox" id="consent" required> I agree that Seahorse may contact me about this enquiry as described in the privacy policy.</label>
+      <button class="btn btn-primary" type="submit" style="width:100%">Send quote request</button>
+      <p class="muted" style="font-size:12.5px;margin:0;text-align:center">Demo: nothing is sent from this preview.</p>
+    </form>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('doc')) document.getElementById('type').value = qs.get('doc');
+  if (qs.get('p') && !SH.rfq.items().some(i => i.slug === qs.get('p') && i.mode === 'quote')) {
+    const p = SH_PRODUCTS.find(x => x.slug === qs.get('p'));
+    if (p) { try { const l = SH.rfq.items(); l.push({ slug: p.slug, pack: SH.bulkPack(p), qty: 1, mode: 'quote' }); localStorage.setItem('sh-rfq', JSON.stringify(l)); } catch {} }
+  }
+  const row = (it, i, p, right) => `<div class="rfq-item"><div class="th"><img src="${p.img}" alt=""></div><div><b>${p.name}</b><small>${p.code} · ${it.pack} × ${it.qty}</small></div><div style="text-align:right">${right}<br><button class="rm" data-rm="${i}" aria-label="Remove ${p.name}">Remove</button></div></div>`;
+  function draw() {
+    const all = SH.rfq.items().map((it, i) => ({ it, i, p: SH_PRODUCTS.find(x => x.slug === it.slug) })).filter(x => x.p);
+    const buy = all.filter(x => x.it.mode === 'buy'), quote = all.filter(x => x.it.mode !== 'buy');
+    document.querySelectorAll('[data-rfq-count]').forEach(e => { e.textContent = all.length; e.dataset.n = all.length; });
+    document.getElementById('nb').textContent = `(${buy.length})`; document.getElementById('nq').textContent = `(${quote.length})`;
+    let sub = 0;
+    document.getElementById('buyItems').innerHTML = buy.length ? buy.map(({ it, i, p }) => { const t = SH_PRICE(p, it.pack) * it.qty; sub += t; return row(it, i, p, `<b>₹${SH.fmt(t)}</b>`); }).join('')
+      : `<div class="empty" style="padding:22px">No small packs yet. Tap <b>Buy</b> on any product to add a 10 ml, 100 ml or 1 kg pack.</div>`;
+    const ship = sub === 0 || sub >= 999 ? 0 : 79;
+    document.getElementById('totals').innerHTML = buy.length ? `<div class="totals"><div><span>Subtotal (incl. GST)</span><span>₹${SH.fmt(sub)}</span></div><div><span>Shipping</span><span>${ship ? '₹' + ship : 'Free'}</span></div><div class="grand"><span>Total</span><span>₹${SH.fmt(sub + ship)}</span></div></div>
+      <button class="btn btn-accent" id="checkout" style="width:100%;margin-top:14px">${SH.icon('shield')}Secure checkout · ₹${SH.fmt(sub + ship)}</button>
+      <div class="paylogos"><span>UPI</span><span>Google Pay</span><span>PhonePe</span><span>Visa</span><span>Mastercard</span><span>RuPay</span><span>NetBanking</span></div>` : '';
+    document.getElementById('quoteItems').innerHTML = quote.length ? quote.map(({ it, i, p }) => row(it, i, p, `<span class="muted" style="font-size:13px">on quote</span>`)).join('')
+      : `<div class="empty" style="padding:22px">No bulk items yet. Use <b>Bulk quote</b> on any product, or just describe your needs in the form.</div>`;
+  }
+  document.getElementById('rfq').addEventListener('click', e => {
+    const b = e.target.closest('[data-rm]'); if (b) { SH.rfq.remove(+b.dataset.rm); draw(); }
+    if (e.target.closest('#checkout')) {
+      const no = 'SH-' + String(Math.floor(Math.random() * 900000) + 100000);
+      const keep = SH.rfq.items().filter(x => x.mode !== 'buy'); try { localStorage.setItem('sh-rfq', JSON.stringify(keep)); } catch {}
+      document.getElementById('cart').innerHTML = `<div class="success"><div class="tick">${SH.icon('tick')}</div><h2>Payment successful</h2><p class="muted">Order number</p><p class="rfq-no">${no}</p><p class="muted">Demo: in the live site Razorpay opens here (UPI, cards, NetBanking) and the payment is verified on our server before the order is confirmed. You get an e-mail and WhatsApp update with tracking.</p></div>`;
+      document.querySelectorAll('[data-rfq-count]').forEach(e => { e.textContent = keep.length; e.dataset.n = keep.length; });
+    }
+  });
+  draw();
+
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault(); let ok = true;
+    const check = (id, test) => { const el = document.getElementById(id); const good = test(el.value.trim()); el.closest('.field').classList.toggle('invalid', !good); if (!good && ok) el.focus(); ok = ok && good; };
+    check('name', v => v.length > 1); check('company', v => v.length > 1);
+    check('email', v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)); check('phone', v => /^\+?[0-9 ()-]{8,}$/.test(v)); check('country', v => !!v);
+    if (!document.getElementById('consent').checked) { ok = false; SH.toast('Please accept the privacy consent'); }
+    if (!ok || document.getElementById('website').value) return;
+    const no = 'RFQ-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 90000) + 10000);
+    const keep = SH.rfq.items().filter(x => x.mode === 'buy'); try { localStorage.setItem('sh-rfq', JSON.stringify(keep)); } catch {}
+    e.target.innerHTML = `<div class="success"><div class="tick">${SH.icon('tick')}</div><h2>Thank you. Your request is with our export team.</h2><p class="muted">Your reference number</p><p class="rfq-no">${no}</p>
+      <p class="muted">A copy has been sent to your e-mail. We usually reply within 24 hours.</p><a class="btn btn-primary" href="products.html">Continue browsing</a></div>`;
+    document.getElementById('quoteItems').innerHTML = `<div class="empty" style="padding:22px">Request sent ✓</div>`;
+  });
+</script>
+</body>
+</html>

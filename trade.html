@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trade Portal · Seahorse Natural Oils</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/img/logo-crop.png">
+<style>
+  .login{display:grid;gap:0;max-width:980px;margin:40px auto;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
+  @media (min-width:860px){.login{grid-template-columns:1fr 1fr}}
+  .login .side{position:relative;min-height:260px;color:#fff;display:flex;align-items:flex-end;isolation:isolate}
+  .login .side img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+  .login .side::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(4,40,39,.2),rgba(4,40,39,.92))}
+  .login .side>div{padding:28px}.login .side h2{color:#fff}.login .side li{margin:6px 0;color:#d9ecea}
+  .login form{padding:30px}
+  .portal-head{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+  .acct{display:flex;gap:14px;align-items:center}
+  .acct .av{width:52px;height:52px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font:700 20px var(--serif)}
+  .private{display:flex;gap:10px;align-items:center;background:var(--tint-bg);color:var(--tint-fg);border-radius:12px;padding:10px 14px;font-size:14px}
+  .private svg{width:20px;height:20px;flex:none}
+  .ptable td .yp{font:700 16px var(--sans);color:var(--text)}
+  .ptable td small{color:var(--muted)}
+  .ptable img{width:44px;height:44px;border-radius:10px;object-fit:cover}
+</style>
+</head>
+<body data-page="">
+<div id="site-header"></div>
+<main id="main">
+  <div class="wrap" id="view">
+    <div class="login">
+      <div class="side"><img src="assets/img/photos/hero-bottles.jpg" alt="">
+        <div><span class="eyebrow" style="color:#F2C766">For regular business customers</span><h2>Seahorse Trade Portal</h2>
+          <ul><li>Your agreed prices on every product</li><li>One-click re-order</li><li>Batch COA &amp; MSDS downloads</li><li>Quotes, orders and statements</li></ul></div></div>
+      <form class="form" id="login" novalidate>
+        <h2 style="font-size:26px;margin:0">Trade login</h2>
+        <p class="muted" style="margin:0;font-size:14px">Accounts are created by Seahorse for approved business customers.</p>
+        <div class="field"><label for="em">Business e-mail</label><input id="em" type="email" autocomplete="username" value="buyer@demo-buyer.example"></div>
+        <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" value="demo-password"></div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Sign in (then e-mail OTP)</button>
+        <p class="muted" style="font-size:13px;margin:0">No account? <a href="contact.html">Apply for a trade account</a></p>
+        <p class="muted" style="font-size:12.5px;margin:0">Demo: signs in as a sample customer. Live site: password + one-time code, lockout after failed tries.</p>
+      </form>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  /* DEMO ONLY: in the live system this list is produced on the server for the signed-in customer only; it never exists in public pages. */
+  const myPrices = [['evening-primrose-oil', '25 kg', 'USD 41.50 / kg', 25, '31 Mar 2027'], ['evening-primrose-oil', '190 kg drum', 'USD 38.90 / kg', 190, '31 Mar 2027'],
+    ['borage-oil', '25 kg', 'USD 56.00 / kg', 25, '31 Mar 2027'], ['clove-oil', '25 kg', 'USD 19.80 / kg', 50, '31 Dec 2026'], ['peppermint-oil', '180 kg drum', 'USD 27.40 / kg', 180, '31 Dec 2026']];
+  document.getElementById('login').addEventListener('submit', e => {
+    e.preventDefault();
+    document.getElementById('view').innerHTML = `
+      <div style="padding:36px 0 10px" class="portal-head">
+        <div class="acct"><div class="av">GA</div><div><h1 style="font-size:28px;margin:0">Gulf Aroma Trading (Demo)</h1><span class="muted">Dubai, UAE · Customer since 2019 · Account manager: Export desk</span></div></div>
+        <button class="btn btn-ghost btn-sm" onclick="location.reload()">Sign out</button>
+      </div>
+      <div class="kpis" style="margin:18px 0">
+        <div class="card kpi"><span>Open quotes</span><b>2</b></div><div class="card kpi"><span>Orders this year</span><b>7</b></div>
+        <div class="card kpi"><span>Next price review</span><b style="font-size:22px">31 Dec 2026</b></div><div class="card kpi"><span>Payment terms</span><b style="font-size:22px">50% adv.</b></div>
+      </div>
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:8px"><h2 style="font-size:22px;margin:0">Your price list</h2>
+          <div class="private">${SH.icon('shield')}These prices are agreed for your account only.</div></div>
+        <div class="table-wrap"><table class="tbl ptable"><thead><tr><th></th><th>Product</th><th>Pack</th><th>Your price</th><th>Min. qty</th><th>Valid till</th><th></th></tr></thead><tbody>
+        ${myPrices.map(([s, pack, pr, mq, vt]) => { const p = SH_PRODUCTS.find(x => x.slug === s);
+          return `<tr><td><img src="${p.img}" alt=""></td><td><b>${p.name}</b><br><small>${p.code} · ${p.grades[0]}</small></td><td>${pack}</td><td><span class="yp">${pr}</span><br><small>FOB Mundra</small></td><td>${mq} kg</td><td>${vt}</td>
+          <td><button class="btn btn-primary btn-sm" data-ro="${s}|${pack}">Re-order</button></td></tr>`; }).join('')}
+        </tbody></table></div>
+      </div>
+      <div class="grid g-2" style="margin:18px 0 10px">
+        <div class="card"><h3 style="font-size:19px">Recent orders</h3><table class="spec" style="font-size:14px"><tbody>
+          <tr><th>PO-2026-118 · EPO 760 kg</th><td><span class="st st-quoted">Shipped</span></td></tr><tr><th>PO-2026-104 · Clove 200 kg</th><td><span class="st st-won">Delivered</span></td></tr><tr><th>PO-2026-097 · Borage 100 kg</th><td><span class="st st-won">Delivered</span></td></tr></tbody></table></div>
+        <div class="card"><h3 style="font-size:19px">Batch documents</h3><div class="doc-row" style="flex-direction:column;align-items:flex-start">
+          <button class="doc">${SH.icon('doc')}COA · EPO batch EPO-2611-07</button><button class="doc">${SH.icon('doc')}MSDS · Evening Primrose Oil</button><button class="doc">${SH.icon('doc')}COA · Clove batch CLV-2610-02</button></div></div>
+      </div>`;
+    window.scrollTo(0, 0);
+  });
+  document.addEventListener('click', e => { const b = e.target.closest('[data-ro]'); if (!b) return; const [s, pack] = b.dataset.ro.split('|'); SH.rfq.add(s, pack, 1, 'quote'); });
+</script>
+</body>
+</html>
